@@ -1,6 +1,8 @@
 # Twitch-Plays-Sudoku
 An extension to connect sudoku.com with twitch chat
 
+found any problem? open an issue (here)[https://github.com/Matsukii/Twitch-Plays-Sudoku/issues/new]!
+
 ## Install
 1. Download or clone the repository, or download from releases
 2. Open extension settings on your browser
