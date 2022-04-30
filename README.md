@@ -2,7 +2,7 @@
 An extension to connect sudoku.com with twitch chat
 
 ## Install
-1. Download or clone the repository
+1. Download or clone the repository, or download from releases
 2. Open extension settings on your browser
 3. toggle "developer mode" ON
 4. click on "load unpacked"
