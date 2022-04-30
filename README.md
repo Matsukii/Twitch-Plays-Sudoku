@@ -36,4 +36,4 @@ currently uses the same language as the website (taken from URL)
 
 portuguese (pt-pt and pt-br) are the same translation, the site forwarded me to one then to other and made it not work once, I duplicated pt and changed to br just to have both.
 
-## LICENSE: (MIT)[https://github.com/Matsukii/Twitch-Plays-Sudoku/blob/main/LICENSE]
+## LICENSE: [MIT](https://github.com/Matsukii/Twitch-Plays-Sudoku/blob/main/LICENSE)
