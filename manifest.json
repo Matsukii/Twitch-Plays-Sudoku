@@ -1,0 +1,13 @@
+{
+    "name": "Twitch Plays Sudoku",
+    "version": "1.0.0",
+    "manifest_version": 2,
+    "content_scripts":[
+        {
+            "matches": ["*://*.sudoku.com/*"],
+            "js": ["./tmi.min.js", "./sudoku.js"],
+            "css": ["./sudoku.css"]
+        }
+    ]
+
+}
