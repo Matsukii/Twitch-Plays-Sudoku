@@ -28,6 +28,17 @@ add them in the url after /, like this:
 https://sudoku.com/evil/?cha=channel&cmd=!sdk
 ```
 
+## Hot-it-works
+* Using [tmi.js](https://github.com/tmijs/tmi.js) by @tmijs, the extension connects to Twitch's IRC chat
+* When a message is received, we check if has the command is the first word of the message
+* if is the first content, we try to get coordinates and the number
+* coordinates gote'm, now what? parse it! convert letter+number to a index from 0-80, as the website is a linear 'line' that builds rows and columns
+* and we check if the number is a number, just to make sure is a number...
+* now we send to the website by emiting a custom event (like saying, "hey page, take this informaton and do something with it"), thats because extensions can't access variables from the website
+* the website keeps listening for this event, when is detected, we call a function that sets the highlighted position
+* then, we generate an keyboard event, saying to the page that a numver was presses in the keyboard
+* thats all folks! 
+
 ## Language support
 currently uses the same language as the website (taken from URL)
 * en
