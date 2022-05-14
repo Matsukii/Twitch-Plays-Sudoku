@@ -1,5 +1,6 @@
 let connected = false;
 let client;
+let debug = false;
 
 // taken from url, ex.: sudoku.com/pt will set lang to pt
 let lang = "en";
@@ -8,6 +9,9 @@ let lang = "en";
 let command = "!command";
 let channel = "";
 
+function debugPrint(...args){
+    if(debug) console.log("TPS - DEBUG : ", ...args);
+}
 
 // Translations
 let langs = {
@@ -21,6 +25,7 @@ let langs = {
         channelName: "Channel name",
         command: "!command",
         invalidValueErr: "your input coordinates or value is invalid!",
+        debug: "debug",
 
         info: `
             <br>
@@ -46,6 +51,7 @@ let langs = {
         channelName: "Nome do Canal",
         command: "!comando",
         invalidValueErr: "seu numero ou coordenadas são invalidos!",
+        debug: "depuração",
 
         info: `
             <br>
@@ -71,6 +77,7 @@ let langs = {
         channelName: "Nome do Canal",
         command: "!comando",
         invalidValueErr: "seu numero ou coordenadas são invalidos!",
+        debug: "depuração",
 
         info: `
             <br>
@@ -99,7 +106,7 @@ document.addEventListener('readystatechange', e => {
             lang = selLang;
         }
         else{
-            console.log(`Language "${selLang}" not available, using English fallback`);
+            debugPrint(`Language "${selLang}" not available, using English fallback`);
             
         }
         
@@ -177,7 +184,8 @@ document.addEventListener('readystatechange', e => {
         }
 
 
-  
+
+        
         let commandInputLabel = document.createElement("label");
         commandInputLabel.innerText = langs[lang]["command"];
         let commandInput = document.createElement("input");
@@ -185,12 +193,39 @@ document.addEventListener('readystatechange', e => {
         commandInput.value = command;
         commandInput.placeholder = langs[lang]["command"];
 
+        let inputTimeout;
         // listen for keyboard and change the command in real-time
         commandInput.addEventListener('keypress', e => {
-            if(e.target.value != ""){
-                command = e.target.value;
-                console.log(`command changed to "${command}"`);
-            }
+            if(inputTimeout) clearTimeout(inputTimeout);
+            inputTimeout = setTimeout(() => {
+                if(e.target.value != ""){
+                    command = e.target.value;
+                    debugPrint(`command changed to "${command}"`);
+                }
+            }, 500);
+        })
+        
+
+
+        let debugInputLabel = document.createElement("label");
+        debugInputLabel.innerText = langs[lang]["debug"];
+        debugInputLabel.for = "sdk-debug-input";
+        let debugInput = document.createElement("input");
+        debugInput.id = "sdk-debug-input";
+        debugInput.type = "checkbox";
+        debugInput.checked = debug;
+        debugInput.value = command;
+        debugInput.placeholder = langs[lang]["debug"];
+
+        let inputTypeTimeout;
+        debugInput.addEventListener('click', e => {
+            if(inputTypeTimeout) clearTimeout(inputTypeTimeout);
+            inputTypeTimeout = setTimeout(() => {
+                if(e.target.value != ""){
+                    debug = e.target.checked;
+                    debugPrint(`debug changed to "${command}"`);
+                }
+            }, 500);
         })
 
 
@@ -221,6 +256,7 @@ document.addEventListener('readystatechange', e => {
         lastMessageName.innerText = "Name";
         let lastMessageContent = document.createElement("span");
         lastMessageContent.innerText = " !sdk 000 000";
+        
 
         lastMessageContainer.appendChild(lastMessageLabel);
         lastMessageContainer.appendChild(document.createElement("br"));
@@ -240,6 +276,8 @@ document.addEventListener('readystatechange', e => {
         container.appendChild(document.createElement("br"));
         container.appendChild(lastMessageContainer);
         container.appendChild(info);
+        container.appendChild(debugInputLabel);
+        container.appendChild(debugInput);
         document.querySelector('div[class="app-teaser-wrapper"]').appendChild(container)
       
         
@@ -280,11 +318,11 @@ document.addEventListener('readystatechange', e => {
         
                 // listen for messages
                 client.on('message', (channel, tags, message="!sdk 0 0", self) => {
-                    console.log(`${tags['display-name']}: ${message}`)
+                    debugPrint(`${tags['display-name']}: ${message}`)
         
                     // checks if starts with the command
                     if(message.startsWith(command)){
-                        console.log("is sdk", message);
+                        debugPrint("is sdk", message);
 
                         lastMessageContainer.style.backgroundColor = "";
 
@@ -299,7 +337,7 @@ document.addEventListener('readystatechange', e => {
 
                         // remove trailing spaces and split to get coord and number
                         formattedMsg = formattedMsg.trim().split(" ");
-                        console.log(formattedMsg);
+                        debugPrint(formattedMsg);
 
                         // checks if the second value is a number
                         if(!isNaN(formattedMsg[1])){
@@ -328,7 +366,7 @@ document.addEventListener('readystatechange', e => {
                                 return ((parseInt(coord[1]) - 1) * rowCellCount) + alphabet.lastIndexOf(coord[0].toLocaleUpperCase());
                             }
                             
-                            console.log(`Received ${position}(${coordToIndex(position, 9)}) : ${value}`);
+                            debugPrint(`Received ${position}(${coordToIndex(position, 9)}) : ${value}`);
                             
 
                             // check if is in correct format (<col><row> <number> | A1 1)
@@ -342,7 +380,7 @@ document.addEventListener('readystatechange', e => {
                                 }}))
                             }
                             else{
-                                console.log("invalid formation");
+                                debugPrint("invalid formation");
                                 lastMessageName.innerText = "SYSTEM: ";
                                 lastMessageName.style.color = "#f44336";
                                 lastMessageContent.innerText = `Hey @${tags['display-name']}, ${langs[lang]["invalidValueErr"]} -> (${message})`;
@@ -351,7 +389,7 @@ document.addEventListener('readystatechange', e => {
                             }
                         }
                         else{
-                            console.log("invalid number");
+                            debugPrint("invalid number");
                             lastMessageName.innerText = "SYSTEM: ";
                             lastMessageName.style.color = "#f44336";
                             lastMessageContent.innerText = `Hey @${tags['display-name']}, ${langs[lang]["invalidValueErr"]} -> (${message})`;
@@ -364,7 +402,7 @@ document.addEventListener('readystatechange', e => {
         
         
                 client.on('connecting', (address, port) => {
-                    console.log(`connecting... ${address}:${port}`);
+                    debugPrint(`connecting... ${address}:${port}`);
                     channelInputLabel.innerText = langs[lang]["Connecting"];
                     channelInputLabel.setAttribute("state", "Connecting");
                     connected = false;
@@ -372,7 +410,7 @@ document.addEventListener('readystatechange', e => {
                 })
                 
                 client.on('connected', (address, port) => {
-                    console.log(`connected! ${address}:${port}`);
+                    debugPrint(`connected! ${address}:${port}`);
                     channelInputLabel.innerText = langs[lang]["Connected"];
                     channelInputLabel.setAttribute("state", "Connected");
                     connectBtn.innerText = langs[lang]["Disconnect"];
