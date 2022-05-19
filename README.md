@@ -21,7 +21,7 @@ found any problem? open an issue [here](https://github.com/Matsukii/Twitch-Plays
 * !s-allow
     * Allow only a group of users to play 
     * example: !s-allow user1,user2,user3
-    * _ramdomize option comming soon!_
+    * _randomize option comming soon!_
 
 ## URL Params
 Since the page takes control over some keys, this is here to help you.
