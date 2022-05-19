@@ -7,7 +7,10 @@ let lang = "en";
 
 // set command and channel then you don't need to change in page or URL 
 let command = "!command";
+let allowusersCommand = "!s-allow "
 let channel = "";
+let allowedUsers = [];
+const moderators = []
 
 function debugPrint(...args){
     if(debug) console.log("TPS - DEBUG : ", ...args);
@@ -26,6 +29,12 @@ let langs = {
         command: "!command",
         invalidValueErr: "your input coordinates or value is invalid!",
         debug: "debug",
+        permit: "Allowed users separated by ,",
+        permitPlaceholder: "users,separated,by,comma",
+        errors: {
+            "duplicate-command": "Duplicated command!\nThis command is reserved to add allowed users and can't be used for guesses!",
+            "allowed-parsing": "Something went wrong while trying to ser allowed users, please review.\n\nList must be users separated by comma (',')\n\nExample:\n\t!s-allow user1,user2",
+        },
 
         info: `
             <br>
@@ -52,6 +61,13 @@ let langs = {
         command: "!comando",
         invalidValueErr: "seu numero ou coordenadas são invalidos!",
         debug: "depuração",
+        permit: "Usuários pernitidos",
+        permitPlaceholder: "usuarios,separados,por,virgula",
+        errors: {
+            "duplicate-command": "Comando duplicado!\nEste comando é reservado para adicionar usuários permitidos e não pode ser usado para tentativas!",
+            "allowed-parsing": "Algo deu errado ao adicionar os usuários a lista de permitidos\n\nA lista deve conter nomes separados por virgula (',')\n\nExemplo:\n\t!s-allow usuario1,usuario2",
+        },
+
 
         info: `
             <br>
@@ -78,6 +94,13 @@ let langs = {
         command: "!comando",
         invalidValueErr: "seu numero ou coordenadas são invalidos!",
         debug: "depuração",
+        permit: "Usuários pernitidos",
+        permitPlaceholder: "usuarios,separados,por,virgula",
+        errors: {
+            "duplicate-command": "Comando duplicado!\nEste comando é reservado para adicionar usuários permitidos e não pode ser usado para tentativas!",
+            "allowed-parsing": "Algo deu errado ao adicionar os usuários a lista de permitidos\n\nA lista deve conter nomes separados por virgula (',')\n\nExemplo:\n\t!s-allow usuario1,usuario2",
+        },
+
 
         info: `
             <br>
@@ -119,7 +142,13 @@ document.addEventListener('readystatechange', e => {
         let pageUrl = new URL(window.location.href);
         let urlCmd = pageUrl.searchParams.get("cmd");
         if(urlCmd){
-            command = urlCmd;
+            if(urlCmd == allowusersCommand.trim()){
+                command = "!sdk"
+            }
+            else{
+                command = urlCmd;
+            }
+            
         }
         let urlchannel = pageUrl.searchParams.get("cha");
         if(urlchannel){
@@ -199,14 +228,42 @@ document.addEventListener('readystatechange', e => {
             if(inputTimeout) clearTimeout(inputTimeout);
             inputTimeout = setTimeout(() => {
                 if(e.target.value != ""){
-                    command = e.target.value;
-                    debugPrint(`command changed to "${command}"`);
+                    if(e.target.value.trim() == allowusersCommand.trim()){
+                        alert(langs[lang]["errors"]["duplicate-command"])
+                    }
+                    else{
+                        command = e.target.value;
+                        debugPrint(`command changed to "${command}"`);
+                    }
+                }
+            }, 500);
+        })
+       
+       
+        // allowed users input
+        let allowUsersLabel = document.createElement("label");
+        allowUsersLabel.innerText = langs[lang]["permit"];
+        allowUsersLabel.title = langs[lang]["permitPlaceholder"];
+        let allowUsers = document.createElement("textarea");
+        allowUsers.id = "sdk-permit-input";
+        allowUsers.value = allowedUsers.toString();
+        allowUsers.placeholder = langs[lang]["permitPlaceholder"];
+        allowUsers.title = langs[lang]["permitPlaceholder"];
+
+        // listen for keyboard and change the command in real-time
+        allowUsers.addEventListener('keypress', e => {
+            if(inputTimeout) clearTimeout(inputTimeout);
+            inputTimeout = setTimeout(() => {
+                if(e.target.value != ""){
+                    allowedUsers = e.target.value.trim().toLowerCase().split(",")
+                    debugPrint(`users allowed changed to `, allowedUsers);
                 }
             }, 500);
         })
         
 
 
+        // debug checkbox
         let debugInputLabel = document.createElement("label");
         debugInputLabel.innerText = langs[lang]["debug"];
         debugInputLabel.for = "sdk-debug-input";
@@ -214,8 +271,6 @@ document.addEventListener('readystatechange', e => {
         debugInput.id = "sdk-debug-input";
         debugInput.type = "checkbox";
         debugInput.checked = debug;
-        debugInput.value = command;
-        debugInput.placeholder = langs[lang]["debug"];
 
         let inputTypeTimeout;
         debugInput.addEventListener('click', e => {
@@ -266,11 +321,16 @@ document.addEventListener('readystatechange', e => {
         
         container.appendChild(channelInputLabelPre);
         container.appendChild(channelInput);
+        
         container.appendChild(commandInputLabel);
         container.appendChild(commandInput);
+        
         container.appendChild(channelInputLabel);
         container.appendChild(connectBtn);
         
+        container.appendChild(document.createElement("br"));
+        container.appendChild(allowUsersLabel);
+        container.appendChild(allowUsers);
         
         container.appendChild(document.createElement("br"));
         container.appendChild(document.createElement("br"));
@@ -294,7 +354,7 @@ document.addEventListener('readystatechange', e => {
         document.getElementById("game").appendChild(numbers);
 
       
-      
+
    
 
         // connect/disconnect from chat
@@ -318,11 +378,55 @@ document.addEventListener('readystatechange', e => {
         
                 // listen for messages
                 client.on('message', (channel, tags, message="!sdk 0 0", self) => {
-                    debugPrint(`${tags['display-name']}: ${message}`)
-        
+                    debugPrint(`${tags['display-name']}: ${message}`);
+                    let badges = tags.badges || {};
+
+                    // for mods and streamer
+                    if(badges.broadcaster || badges.moderator || moderators.includes(tags['display-name'])){
+
+                        // add/remove allowed users trough command
+                        // @example: !s-allow user1,user2,user3 to allow only them
+                        // @example: !s-allow * to clear and allow everyone
+                        if(message.startsWith(allowusersCommand)){
+                            let msg = message.replace(allowusersCommand, "");
+
+                            debugPrint("mod or broadcaster msg: ", msg);
+                            
+                            // check if is *
+                            if(msg == "*"){
+                                allowedUsers = [];
+                                allowUsers.value = "";
+                                debugPrint(`Allowed users changed to everyone by @${tags['display-name']}`);
+                            }
+                            else{
+                                // try to get users
+                                try {
+                                    allowedUsers = msg.trim().toLowerCase().split(",");
+                                    allowUsers.value = allowedUsers.toString();
+                                    debugPrint("Allowed users changed to: ", allowedUsers, `by @${tags['display-name']}`);
+                                } catch (error) {
+                                    alert(`${langs[lang]["errors"]["allowed-parsing"]} \n\n Received: ${msg}`);
+                                    debugPrint(`${langs[lang]["errors"]["allowed-parsing"]} \n\n Received: ${msg}`);
+                                }
+                            }
+                        }
+
+
+
+
+                    }
+
                     // checks if starts with the command
                     if(message.startsWith(command)){
                         debugPrint("is sdk", message);
+                        
+                        // handle allowed users
+                        if(allowedUsers.length != 0 && !(allowedUsers.includes(tags['display-name'].toLowerCase()))){
+                            debugPrint(`user ${tags['display-name']} is not allowed`);
+                            return;
+                        }
+                        
+                        
 
                         lastMessageContainer.style.backgroundColor = "";
 
