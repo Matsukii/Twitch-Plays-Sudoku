@@ -19,6 +19,7 @@ found any problem? open an issue [here](https://github.com/Matsukii/Twitch-Plays
 ## Commands
 
 * !s-allow
+    * **only for broadcaster and moderators**
     * Allow only a group of users to play 
     * example: !s-allow user1,user2,user3
     * _randomize option comming soon!_
