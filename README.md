@@ -16,6 +16,13 @@ found any problem? open an issue [here](https://github.com/Matsukii/Twitch-Plays
 * Send a message with the command you have set, ex.: !sdk A1 1 to place number 1 in the first column of the first row
 * Have fun!
 
+## Commands
+
+* !s-allow
+    * Allow only a group of users to play 
+    * example: !s-allow user1,user2,user3
+    * _ramdomize option comming soon!_
+
 ## URL Params
 Since the page takes control over some keys, this is here to help you.
 
