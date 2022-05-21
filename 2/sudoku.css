@@ -1,0 +1,103 @@
+#coord-cols{
+                
+    list-style: none;
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    position: absolute;
+    top: -25px;
+
+}
+#coord-rows{
+    list-style: none;
+    display: flex;
+    /* height: 100%; */
+    height: 534px;
+    justify-content: space-around;
+    flex-direction: column;
+    top: 0;
+    position: absolute;
+    left: -20px;
+}
+
+#game-wrapper{
+    margin-top: 50px;
+    margin-left: 10px;
+}
+
+
+#sdk-controls{
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+}
+
+#sdk-channel-input{
+    border: none;
+    padding: 6px 10px;
+    background-color: #d2dae7;
+    width: 250px;
+    border-radius: 6px;
+}
+#sdk-permit-input{
+    border: none;
+    padding: 6px 10px;
+    background-color: #d2dae7;
+    width: 250px;
+    border-radius: 6px;
+}
+#sdk-command-input{
+    border: none;
+    padding: 6px 10px;
+    background-color: #d2dae7;
+    width: 250px;
+    border-radius: 6px;
+}
+#sdk-channel-input::before{
+    content: "A";
+    /* position: absolute; */
+    top: 0;
+    left: 0;
+    background-color: red;
+    width: 50px;
+    height: 10px;
+}
+
+#sdk-controls button{
+    border: none;
+    background-color: #d2dae7;
+    color: #0072e3;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin: 5px;
+}
+#sdk-controls button[state="Connected"]{
+    color: #f44336;
+    background-color: #f443361a;
+}
+
+
+#sdk-status{
+    font-weight: 600;
+    display: inline-block;
+    width: 130px;
+    min-width: 130px;
+}
+#sdk-status[state="Connected"]{
+    color: #4caf50;
+    width: 150px;
+}
+#sdk-status[state="Connecting"]{
+    color: #ff9800;
+}
+#sdk-status[state="Disconnected"]{
+    color: #f44336;
+    width: 170px;
+}
+
+#sdk-last-message b{
+    
+}
+#sdk-last-message span{
+
+}
