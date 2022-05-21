@@ -1,0 +1,19 @@
+{
+    "name": "Twitch Plays Sudoku",
+    "version": "1.0.3",
+    "manifest_version": 2,
+    "content_scripts":[
+        {
+            "matches": ["*://*.shnapps.dachev.com/*"],
+            "js": [
+                "./config.js",
+                "./translations.js",
+                "./coordToIndex.js",
+                "./tmi.min.js",
+                "./sudoku.js"
+            ],
+            "css": ["./sudoku.css"]
+        }
+    ]
+
+}
